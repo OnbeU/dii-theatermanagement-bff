@@ -43,4 +43,16 @@
 		<ProjectReference Include="..\..\tobenuget\Common\Common.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Reference Include="onbelogginglibrary">
+	    <HintPath>Assets\onbelogginglibrary.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Assets\onbelogginglibrary.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>

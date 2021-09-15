@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using onbe.logging.extensions;
 
 namespace Dii_TheaterManagement_Bff
 {
@@ -21,6 +22,10 @@ namespace Dii_TheaterManagement_Bff
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                }).ConfigureLogging((builder) =>
+                {
+                    builder.ClearProviders().AddOnbeLog("Dii_TheaterManagement_Bff");
                 });
     }
+}
 }

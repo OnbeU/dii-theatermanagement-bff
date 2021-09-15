@@ -4,6 +4,7 @@ using Dii_OrderingSvc.Fake.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Dii_OrderingSvc.Fake.Controllers
 {
@@ -12,16 +13,19 @@ namespace Dii_OrderingSvc.Fake.Controllers
     public class BookingsController : ControllerBase
     {
         private readonly OrderingSvcContext _context;
+        private readonly ILogger<BookingsController> logger;
 
-        public BookingsController(OrderingSvcContext context)
+        public BookingsController(OrderingSvcContext context, ILogger<BookingsController> logger)
         {
             _context = context;
+            this.logger = logger;
         }
 
         // GET: api/Bookings
         [HttpGet("{theaterCode}/bookings")]
         public async Task<ActionResult<IEnumerable<Booking>>> GetBookings(string theaterCode)
         {
+            
             var bookings = await _context.Bookings
                 .AsNoTracking()
                 .Where(b => b.TheaterCode == theaterCode)

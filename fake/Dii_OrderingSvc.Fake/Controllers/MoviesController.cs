@@ -4,6 +4,7 @@ using Dii_OrderingSvc.Fake.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Dii_OrderingSvc.Fake.Controllers
 {
@@ -13,9 +14,11 @@ namespace Dii_OrderingSvc.Fake.Controllers
     {
         private readonly OrderingSvcContext _context;
 
-        public MoviesController(OrderingSvcContext context)
+        private readonly ILogger<MoviesController> logger;
+        public MoviesController(OrderingSvcContext context, ILogger<MoviesController> logger)
         {
             _context = context;
+            this.logger = logger;
         }
 
         // GET: api/Movies
