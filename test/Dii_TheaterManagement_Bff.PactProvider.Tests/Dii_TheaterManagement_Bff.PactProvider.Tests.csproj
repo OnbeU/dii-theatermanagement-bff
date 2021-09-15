@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\fake\Dii_OrderingSvc.Fake\Dii_OrderingSvc.Fake.csproj" />
     <ProjectReference Include="..\..\src\Dii_TheaterManagement_Bff\Dii_TheaterManagement_Bff.csproj" />
     <ProjectReference Include="..\..\tobenuget\Common\Common.csproj" />
   </ItemGroup>

@@ -14,6 +14,7 @@
 namespace Dii_TheaterManagement_Bff.Clients
 {
     using Microsoft.AspNetCore.Http;
+    using System;
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.11.3.0 (NJsonSchema v10.4.4.0 (Newtonsoft.Json v12.0.0.0))")]
@@ -413,6 +414,11 @@ namespace Dii_TheaterManagement_Bff.Clients
                             response_.Dispose();
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw;
+
             }
             finally
             {

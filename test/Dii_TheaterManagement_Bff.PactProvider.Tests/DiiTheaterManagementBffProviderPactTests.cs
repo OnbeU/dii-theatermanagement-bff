@@ -14,45 +14,56 @@ using Xunit.Abstractions;
 namespace Dii_TheaterManagement_Bff.PactProvider.Tests
 {
     public class DiiTheaterManagementBffProviderPactTests
-         : IClassFixture<WebApplicationFactory<Dii_TheaterManagement_Bff.Startup>>
+         : IClassFixture<WebApplicationFactory<Dii_TheaterManagement_Bff.Startup>>,
+        IClassFixture<WebApplicationFactory<Dii_OrderingSvc.Fake.Startup>>
     {
         private readonly ITestOutputHelper _outputHelper;
         private readonly WebApplicationFactory<Dii_TheaterManagement_Bff.Startup> _factory;
-
-        public DiiTheaterManagementBffProviderPactTests(ITestOutputHelper testOutputHelper, WebApplicationFactory<Dii_TheaterManagement_Bff.Startup> factory)
+        private readonly WebApplicationFactory<Dii_OrderingSvc.Fake.Startup> _orderServiceFakeFactory;
+        private readonly PactVerifierConfig pactVerifierConfig;
+        private const string providerId = "dii-theatermanagement-bff";
+        public DiiTheaterManagementBffProviderPactTests(ITestOutputHelper testOutputHelper, 
+            WebApplicationFactory<Dii_TheaterManagement_Bff.Startup> factory
+            , WebApplicationFactory<Dii_OrderingSvc.Fake.Startup> orderServiceFakeFactory)
         {
             _outputHelper = testOutputHelper;
             _factory = factory;
-        }
-
-        [Fact]
-        public void HonorPactWithMvc()
-        {
+            _orderServiceFakeFactory = orderServiceFakeFactory;
             // Arrange
-            var config = new PactVerifierConfig
+            pactVerifierConfig = new PactVerifierConfig
             {
                 Outputters = new List<IOutput> { new XUnitOutput(_outputHelper) },
                 Verbose = true, // Output verbose verification logs to the test output
+                ProviderVersion = Environment.GetEnvironmentVariable("GIT_COMMIT"),
+                PublishVerificationResults = "true".Equals(Environment.GetEnvironmentVariable("PublishPactVerificationResults"))
             };
+        }
+
+        [Fact (Skip = "To do Later")]
+        public void HonorPactWithMvc()
+        {
+
+            // Arrange
+            string consumerId = "dii-theatermanagement-web";
 
             //Act / Assert
-            string executingDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location); // e.g. C:\src\dii\dii-admin-web\tests\FakeTheaterBff.Tests\bin\Debug\net5.0
-            string pactsSharedItemsDir = Path.Combine(executingDir, @"..\..\..\..\Pacts");                           // e.g. C:\src\dii\dii-admin-web\tests\FakeTheaterBff.Tests\bin\Debug\net5.0\..\..\..\..\Pacts
-            string absolutePathToSharedItemsDir = Path.GetFullPath(pactsSharedItemsDir);                             // e.g. C:\src\dii\dii-admin-web\tests\Pacts
-            string absolutePathToPactFile = Path.Combine(absolutePathToSharedItemsDir, $"dii-theater-mvc-dii-theater-bff.json");
-            string consumerId = "dii-theater-mvc";
-            string providerId = "dii-theater-bff";
-
             var httpClientForInMemoryInstanceOfApp = _factory.CreateClient();
             using (var inMemoryReverseProxy = new InMemoryReverseProxy(httpClientForInMemoryInstanceOfApp))
             {
                 string providerBase = inMemoryReverseProxy.LocalhostAddress;
 
-                IPactVerifier pactVerifier = new PactVerifier(config);
+                IPactVerifier pactVerifier = new PactVerifier(pactVerifierConfig);
                 pactVerifier.ProviderState($"{providerBase}/provider-states")
                     .ServiceProvider(providerId, providerBase)
                     .HonoursPactWith(consumerId)
-                    .PactUri(absolutePathToPactFile)
+                    //.PactUri(absolutePathToPactFile)
+                    .PactBroker(
+                        "https://onbe.pactflow.io",
+                        consumerVersionSelectors: new List<VersionTagSelector>
+                        {
+                            new VersionTagSelector("main", latest: true),
+                            new VersionTagSelector("production", latest: true)
+                        })
                     .Verify();
             }
         }
@@ -60,31 +71,30 @@ namespace Dii_TheaterManagement_Bff.PactProvider.Tests
         [Fact]
         public void HonorPactWithSpa()
         {
-            // Arrange
-            var config = new PactVerifierConfig
-            {
-                Outputters = new List<IOutput> { new XUnitOutput(_outputHelper) },
-                Verbose = true, // Output verbose verification logs to the test output
-            };
-
-            //Act / Assert
-            string executingDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);  // e.g. C:\src\dii\dii-admin-web\tests\FakeTheaterBff.Tests\bin\Debug\net5.0
-            string pactsDir = Path.Combine(executingDir, @"..\..\..\..\..\src\bcfinal-theatermanagement-spa\pacts");  // e.g. C:\src\dii\dii-admin-web\tests\FakeTheaterBff.Tests\bin\Debug\net5.0\..\..\..\..\..\src\bcfinal-theatermanagement-spa\pacts
-            string absolutePathToSharedItemsDir = Path.GetFullPath(pactsDir);                                         // e.g. C:\src\dii\dii-admin-web\src\bcfinal-theatermanagement-spa\pacts
-            string absolutePathToPactFile = Path.Combine(absolutePathToSharedItemsDir, $"bcfinal-theatermanagement-spa-bcfinal-theatermanagement-bff.json");
             string consumerId = "dii-theatermanagement-spa";
-            string providerId = "dii-theatermanagement-bff";
+
 
             var httpClientForInMemoryInstanceOfApp = _factory.CreateClient();
+            var httpClientForInMemoryInstanceOfOrderingSvcApp = _orderServiceFakeFactory.CreateClient();
+
+            using (var inMemoryReverseProxyOrderinfSvc = new InMemoryReverseProxy(httpClientForInMemoryInstanceOfOrderingSvcApp))
             using (var inMemoryReverseProxy = new InMemoryReverseProxy(httpClientForInMemoryInstanceOfApp))
             {
-                string providerBase = inMemoryReverseProxy.LocalhostAddress;
+                string providerBase = inMemoryReverseProxyOrderinfSvc.LocalhostAddress;
+                string providerUri = inMemoryReverseProxy.LocalhostAddress;
 
-                IPactVerifier pactVerifier = new PactVerifier(config);
+                IPactVerifier pactVerifier = new PactVerifier(pactVerifierConfig);
                 pactVerifier.ProviderState($"{providerBase}/provider-states")
-                    .ServiceProvider(providerId, providerBase)
+                    .ServiceProvider(providerId, providerUri)
                     .HonoursPactWith(consumerId)
-                    .PactUri(absolutePathToPactFile)
+                    //.PactUri(absolutePathToPactFile)
+                    .PactBroker(
+                        "https://onbe.pactflow.io",
+                        consumerVersionSelectors: new List<VersionTagSelector>
+                        {
+                            new VersionTagSelector("stagesite", latest: true),
+                           // new VersionTagSelector("production", latest: true)
+                        })
                     .Verify();
             }
         }
