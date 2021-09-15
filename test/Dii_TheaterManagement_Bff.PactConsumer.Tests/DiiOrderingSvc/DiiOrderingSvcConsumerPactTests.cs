@@ -25,7 +25,7 @@ namespace Dii_TheaterManagement_Bff.PactConsumer.Tests.DiiOrderingSvc
 
         }
 
-        [Fact]
+        [Fact(Skip ="TBD")]
         public async Task ClientForOrderingSvc_Movies_GivenSomeMovies()
         {
             // Arrange
