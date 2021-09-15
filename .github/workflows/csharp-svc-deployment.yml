@@ -32,6 +32,7 @@ jobs:
 #       PACT_BROKER_TOKEN: ''
     
     - name: 'Build and Deploy Apps'
+      id: publishapp
       uses: OnbeUStudent/devopssetup/actions/csharpdeploy@master
       with: 
         APP_NAME: ${{ env.APP_NAME}}
@@ -43,3 +44,15 @@ jobs:
         PROD_SITE_AKS_NAME: ${{ secrets.STAGE_SITE_AKS_NAME }}
         PROD_SITE_AKS_RESOURCE_GROUP: ${{ secrets.STAGE_SITE_AKS_RESOURCE_GROUP }}
         HOST_NAME: ${{ secrets.HOST_URL }}
+    
+    - uses: actions/github-script@v4
+      name: 'Create github pr comment and deployment'
+      if: github.event_name == 'pull_request' && github.event.action != 'closed'
+      with:
+        script: | 
+          await github.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: "Review PR here - https://${{ steps.publishapp.outputs.DEPLOYED_APP_URL }}"
+                })
