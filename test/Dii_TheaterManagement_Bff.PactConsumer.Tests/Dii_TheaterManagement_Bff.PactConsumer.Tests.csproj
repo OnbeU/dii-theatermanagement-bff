@@ -22,4 +22,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Dii_TheaterManagement_Bff\Dii_TheaterManagement_Bff.csproj" />
+  </ItemGroup>
+
 </Project>

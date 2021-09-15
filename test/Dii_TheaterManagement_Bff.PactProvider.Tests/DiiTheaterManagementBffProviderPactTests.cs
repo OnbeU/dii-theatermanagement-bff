@@ -10,20 +10,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using Dii_TheaterManagement_Bff.PactProvider;
 
 namespace Dii_TheaterManagement_Bff.PactProvider.Tests
 {
     public class DiiTheaterManagementBffProviderPactTests
-         : IClassFixture<WebApplicationFactory<Dii_TheaterManagement_Bff.Startup>>,
+         : IClassFixture<CustomWebApplicationFactory<Startup>>,
         IClassFixture<WebApplicationFactory<Dii_OrderingSvc.Fake.Startup>>
     {
         private readonly ITestOutputHelper _outputHelper;
-        private readonly WebApplicationFactory<Dii_TheaterManagement_Bff.Startup> _factory;
+        private readonly CustomWebApplicationFactory<Startup> _factory;
         private readonly WebApplicationFactory<Dii_OrderingSvc.Fake.Startup> _orderServiceFakeFactory;
         private readonly PactVerifierConfig pactVerifierConfig;
         private const string providerId = "dii-theatermanagement-bff";
-        public DiiTheaterManagementBffProviderPactTests(ITestOutputHelper testOutputHelper, 
-            WebApplicationFactory<Dii_TheaterManagement_Bff.Startup> factory
+        public DiiTheaterManagementBffProviderPactTests(ITestOutputHelper testOutputHelper,
+            CustomWebApplicationFactory<Startup> factory
             , WebApplicationFactory<Dii_OrderingSvc.Fake.Startup> orderServiceFakeFactory)
         {
             _outputHelper = testOutputHelper;
@@ -77,15 +78,16 @@ namespace Dii_TheaterManagement_Bff.PactProvider.Tests
             var httpClientForInMemoryInstanceOfApp = _factory.CreateClient();
             var httpClientForInMemoryInstanceOfOrderingSvcApp = _orderServiceFakeFactory.CreateClient();
 
-            using (var inMemoryReverseProxyOrderinfSvc = new InMemoryReverseProxy(httpClientForInMemoryInstanceOfOrderingSvcApp))
+            using (var inMemoryReverseProxy_OrderingSvc = new InMemoryReverseProxy(httpClientForInMemoryInstanceOfOrderingSvcApp))
             using (var inMemoryReverseProxy = new InMemoryReverseProxy(httpClientForInMemoryInstanceOfApp))
             {
-                string providerBase = inMemoryReverseProxyOrderinfSvc.LocalhostAddress;
-                string providerUri = inMemoryReverseProxy.LocalhostAddress;
+                string ProviderStateBase = inMemoryReverseProxy_OrderingSvc.LocalhostAddress;
+                string providerBase = inMemoryReverseProxy.LocalhostAddress;
+                Startup.OrderingHttpClientBaseAddress = ProviderStateBase;
 
                 IPactVerifier pactVerifier = new PactVerifier(pactVerifierConfig);
-                pactVerifier.ProviderState($"{providerBase}/provider-states")
-                    .ServiceProvider(providerId, providerUri)
+                pactVerifier.ProviderState($"{ProviderStateBase}/provider-states")
+                    .ServiceProvider(providerId, providerBase)
                     .HonoursPactWith(consumerId)
                     //.PactUri(absolutePathToPactFile)
                     .PactBroker(
@@ -96,6 +98,8 @@ namespace Dii_TheaterManagement_Bff.PactProvider.Tests
                            // new VersionTagSelector("production", latest: true)
                         })
                     .Verify();
+
+          
             }
         }
     }

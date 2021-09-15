@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Dapr.Client;
 using Dii_TheaterManagement_Bff.Clients;
@@ -29,7 +30,7 @@ namespace Dii_TheaterManagement_Bff
 
         public IConfiguration Configuration { get; }
         private readonly string _policyName = "CorsPolicy";
-
+        public static string OrderingHttpClientBaseAddress = string.Empty;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -121,7 +122,7 @@ namespace Dii_TheaterManagement_Bff
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-          //  if (env.IsDevelopment())
+            //  if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
@@ -146,15 +147,27 @@ namespace Dii_TheaterManagement_Bff
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-
-            services.AddSingleton(typeof(OrderingSvcClient), serviceProvider => {
-                var httpClient = DaprClient.CreateInvokeHttpClient("diiorderingsvc");
-                return new OrderingSvcClient(httpClient);
-            });
-            services.AddSingleton(typeof(MovieCatalogSvcClient), serviceProvider => {
-                var httpClient = DaprClient.CreateInvokeHttpClient("diimoviecatalogsvc");
-                return new MovieCatalogSvcClient(httpClient);
-            });
+            if (Startup.OrderingHttpClientBaseAddress == string.Empty)
+            {
+                services.AddSingleton(typeof(OrderingSvcClient), serviceProvider =>
+                {
+                    var httpClient = DaprClient.CreateInvokeHttpClient("diiorderingsvc");
+                    return new OrderingSvcClient(httpClient);
+                });
+                services.AddSingleton(typeof(MovieCatalogSvcClient), serviceProvider =>
+                {
+                    var httpClient = DaprClient.CreateInvokeHttpClient("diimoviecatalogsvc");
+                    return new MovieCatalogSvcClient(httpClient);
+                });
+            }
+            else
+            {
+                services.AddHttpClient(nameof(OrderingSvcClient), (serviceProvider, client) =>
+                {
+                    client.BaseAddress = new Uri(Startup.OrderingHttpClientBaseAddress);
+                })
+            .AddTypedClient<OrderingSvcClient>();
+            }
             return services;
         }
     }
