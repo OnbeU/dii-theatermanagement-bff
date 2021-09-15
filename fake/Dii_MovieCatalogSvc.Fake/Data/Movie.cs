@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+//test
 namespace Dii_MovieCatalogSvc.Fake.Data
 {
     public class Movie
