@@ -25,11 +25,12 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-#   - name: 'Run Dotnet Tests'
-#     uses: OnbeUStudent/devopssetup/actions/dotnettest@master
-#     with: 
-#       PACT_BROKER_BASE_URL: ''
-#       PACT_BROKER_TOKEN: ''
+    - name: 'Run Dotnet Tests'
+      uses: OnbeUStudent/devopssetup/actions/csharptest@master
+      with: 
+        PACT_BROKER_BASE_URL: ${{ secrets.PACT_BROKER_BASE_URL }}
+        PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
+        PACT_PACTICIPANT: 'dii-theatermanagement-bff'
     
     - name: 'Build and Deploy Apps'
       id: publishapp
