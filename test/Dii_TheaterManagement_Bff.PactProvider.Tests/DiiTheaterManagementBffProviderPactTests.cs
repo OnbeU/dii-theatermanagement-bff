@@ -97,7 +97,7 @@ namespace Dii_TheaterManagement_Bff.PactProvider.Tests
  //        new VersionTagSelector("stagesite", latest: true),
  //       // new VersionTagSelector("production", latest: true)
  //    })
-                    .PactUri($"https://onbe.pactflow.io/pacts/provider/{providerId}/consumer/{consumerId}/latest", new PactUriOptions(Environment.GetEnvironmentVariable("PACT_BROKER_TOKEN")))
+                    .PactUri($"https://onbe.pactflow.io/pacts/provider/{providerId}/consumer/{consumerId}/latest", new PactUriOptions("4pYBeAABs7e_1rTC98q07w"))
 
                     .Verify();
 
