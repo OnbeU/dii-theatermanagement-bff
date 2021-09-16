@@ -11,6 +11,7 @@ on:
 
 env:
   APP_NAME: Dii_TheaterManagement_Bff
+  PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
 jobs:
   build:
     name: Deployment Pipeline
