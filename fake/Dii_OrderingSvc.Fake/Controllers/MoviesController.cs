@@ -27,6 +27,7 @@ namespace Dii_OrderingSvc.Fake.Controllers
         {
             return await _context.Movies
                 .Include(movie => movie.MovieMetadata)
+                .Where(m => m.MovieId == -1)
                 .ToListAsync();
         }
 

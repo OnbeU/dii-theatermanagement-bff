@@ -40,7 +40,7 @@ namespace Dii_TheaterManagement_Bff.PactProvider.Tests
             };
         }
 
-        [Fact (Skip = "To do Later")]
+        [Fact(Skip = "To do Later")]
         public void HonorPactWithMvc()
         {
 
@@ -89,17 +89,19 @@ namespace Dii_TheaterManagement_Bff.PactProvider.Tests
                 pactVerifier.ProviderState($"{ProviderStateBase}/provider-states")
                     .ServiceProvider(providerId, providerBase)
                     .HonoursPactWith(consumerId)
-                    //.PactUri(absolutePathToPactFile)
-                    .PactBroker(
-                        "https://onbe.pactflow.io",
-                        consumerVersionSelectors: new List<VersionTagSelector>
-                        {
-                            new VersionTagSelector("stagesite", latest: true),
-                           // new VersionTagSelector("production", latest: true)
-                        })
+ //.PactUri(absolutePathToPactFile)
+ //.PactBroker(
+ //    "https://onbe.pactflow.io",
+ //    consumerVersionSelectors: new List<VersionTagSelector>
+ //    {
+ //        new VersionTagSelector("stagesite", latest: true),
+ //       // new VersionTagSelector("production", latest: true)
+ //    })
+                    .PactUri($"https://onbe.pactflow.io/pacts/provider/{providerId}/consumer/{consumerId}/latest", new PactUriOptions(Environment.GetEnvironmentVariable("PACT_BROKER_TOKEN")))
+
                     .Verify();
 
-          
+
             }
         }
     }
