@@ -38,6 +38,7 @@ namespace Dii_TheaterManagement_Bff.PactProvider.Tests
                 Verbose = true, // Output verbose verification logs to the test output
                 ProviderVersion = Environment.GetEnvironmentVariable("GIT_COMMIT"),
                 PublishVerificationResults = "true".Equals(Environment.GetEnvironmentVariable("PACT_PUBLISH_VERIFICATION"))
+
             };
             PACT_VERIFICATION_TAG = Environment.GetEnvironmentVariable("PACT_VERIFICATION_TAG");
         }
