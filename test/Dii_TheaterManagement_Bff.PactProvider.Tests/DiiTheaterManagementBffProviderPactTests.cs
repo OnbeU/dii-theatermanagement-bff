@@ -23,7 +23,6 @@ namespace Dii_TheaterManagement_Bff.PactProvider.Tests
         private readonly WebApplicationFactory<Dii_OrderingSvc.Fake.Startup> _orderServiceFakeFactory;
         private readonly PactVerifierConfig pactVerifierConfig;
         private const string providerId = "dii-theatermanagement-bff";
-        public string PACT_VERIFICATION_TAG;
         public DiiTheaterManagementBffProviderPactTests(ITestOutputHelper testOutputHelper,
             CustomWebApplicationFactory<Startup> factory
             , WebApplicationFactory<Dii_OrderingSvc.Fake.Startup> orderServiceFakeFactory)
@@ -40,7 +39,6 @@ namespace Dii_TheaterManagement_Bff.PactProvider.Tests
                 PublishVerificationResults = "true".Equals(Environment.GetEnvironmentVariable("PACT_PUBLISH_VERIFICATION"))
 
             };
-            PACT_VERIFICATION_TAG = Environment.GetEnvironmentVariable("PACT_VERIFICATION_TAG");
         }
 
         [Fact(Skip = "To do Later")]
@@ -92,7 +90,7 @@ namespace Dii_TheaterManagement_Bff.PactProvider.Tests
                 pactVerifier.ProviderState($"{ProviderStateBase}/provider-states")
                     .ServiceProvider(providerId, providerBase)
                     .HonoursPactWith(consumerId)
-                    .PactUri($"https://onbe.pactflow.io/pacts/provider/{providerId}/consumer/{consumerId}/latest/{PACT_VERIFICATION_TAG}", new PactUriOptions(Environment.GetEnvironmentVariable("PACT_BROKER_TOKEN")))
+                    .PactUri($"https://onbe.pactflow.io/pacts/provider/{providerId}/consumer/{consumerId}/latest", new PactUriOptions(Environment.GetEnvironmentVariable("PACT_BROKER_TOKEN")))
                     .Verify();
             }
         }
