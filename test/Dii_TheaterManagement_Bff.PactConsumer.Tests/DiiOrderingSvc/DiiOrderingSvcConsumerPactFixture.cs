@@ -33,8 +33,8 @@ namespace Dii_TheaterManagement_Bff.PactConsumer.Tests.DiiOrderingSvc
 
             PactBuilder = new PactBuilder(pactConfig);
 
-            PactBuilder.ServiceConsumer("dii-theatermanagement-bff")
-                       .HasPactWith("dii-ordering-svc");
+            PactBuilder.ServiceConsumer("green-theatermanagement-bff")
+                       .HasPactWith("green-ordering-svc");
 
             MockProviderService = PactBuilder.MockService(MockServerPort);
         }
